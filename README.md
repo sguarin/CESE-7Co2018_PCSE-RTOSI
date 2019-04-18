@@ -23,6 +23,7 @@ platformio run -t uploadfs --upload-port /dev/ttyUSB0
 platformio run -t upload --upload-port /dev/ttyUSB0
 
 4. Connect to Wifi network
+
   SSID XXXX
   secret miclave00
 
