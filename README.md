@@ -12,19 +12,27 @@
 
     * En Linux:
     
-    ```~/.platformio/packages/tool-esptool/esptool -ce -v -cp /dev/ttyUSB0```
+    ```
+    ~/.platformio/packages/tool-esptool/esptool -ce -v -cp /dev/ttyUSB0
+    ```
 
     * En Windows
     
-    ```.platformio/packages/tool-esptool/esptool -ce -v -cp COM3```
+    ```
+    .platformio/packages/tool-esptool/esptool -ce -v -cp COM3
+    ```
 
 2. Upload data FS
 
-  ```platformio run -t uploadfs --upload-port /dev/ttyUSB0```
+  ```
+  platformio run -t uploadfs --upload-port /dev/ttyUSB0
+  ```
 
 3. Compile and upload FW
 
-  ```platformio run -t upload --upload-port /dev/ttyUSB0```
+  ```
+  platformio run -t upload --upload-port /dev/ttyUSB0
+  ```
 
 4. Connect to Wifi network
 
