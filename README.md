@@ -37,6 +37,7 @@
 4. Connect to Wifi network
 
   SSID XXXX
+  
   secret miclave00
 
 5. Open url in browser
