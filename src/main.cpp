@@ -7,7 +7,7 @@
 ******************************************************************************/
 
 #include <Arduino.h>
-#include "main.h"
+#include <main.h>
 
 typedef struct item {
 	uint16_t CO2; // PPM
@@ -73,6 +73,12 @@ void SDTask( void * pvParameters) {
 	}
 }
 
+
+void transmitTask ( void *pvParameters) {
+	BaseType_t rv;
+
+}
+
 void setup()
 {
 	Serial.begin(115200);
@@ -96,6 +102,15 @@ void setup()
 			10000,      /* Stack size in words */
 			NULL,       /* Task input parameter */
 			1,          /* Priority of the task */
+			NULL,       /* Task handle. */
+			1);  /* Core where the task should run */
+
+	xTaskCreatePinnedToCore(
+			transmitTask,   /* Function to implement the task */
+			"transmitTask", /* Name of the task */
+			10000,      /* Stack size in words */
+			NULL,       /* Task input parameter */
+			2,          /* Priority of the task */
 			NULL,       /* Task handle. */
 			1);  /* Core where the task should run */
 
