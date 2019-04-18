@@ -34,13 +34,13 @@ void sensorsTask( void * pvParameters ) {
     		dataItem.CO2 = Sensors.getCO2();
     		dataItem.TVOC =  Sensors.getTVOC();
     		dataItem.millis =  Sensors.getRTC();
-    		rv = xQueueSend(dataStoreQueue, &dataItem, 10/portTICK_PERIOD_MS);
+    		rv = xQueueSend(dataStoreQueue, &dataItem, portMAX_DELAY);
     		if (rv != pdPASS) {
     			DEBUG_MAIN("Error: pushing to dataStoreQueue\n");
     		}
-    		rv = xQueueSend(dataTransmitQueue, &dataItem, 10/portTICK_PERIOD_MS);
+    		rv = xQueueSend(dataTransmitQueue, &dataItem, portMAX_DELAY);
     		if (rv != pdPASS) {
-    			DEBUG_MAIN("Error: pushing to dataStoreQueue\n");
+    			DEBUG_MAIN("Error: pushing to dataTransmitQueue\n");
     		}
     		// If I readed the sensors delay task for 1 second
     		vTaskDelay(1000 / portTICK_PERIOD_MS);
@@ -59,33 +59,39 @@ void SDTask( void * pvParameters) {
 	BaseType_t rv;
 	dataItem_t dataItem;
 	while (1) {
-		while (uxQueueMessagesWaiting(dataStoreQueue)) {
-			rv = xQueueReceive(dataStoreQueue, &dataItem, 0);
-			if (rv != pdPASS) {
-				DEBUG_MAIN("Error: getting data from dataQueue\n");
-			} else {
-
-				sd.appendLine("")
-				DEBUG_MAIN("Dequeue sample CO2:%u\n", Sensors.getCO2());
-			}
+		rv = xQueueReceive(dataStoreQueue, &dataItem, portMAX_DELAY);
+		if (rv != pdPASS) {
+			DEBUG_MAIN("Error: getting data from dataQueue\n");
+		} else {
+			// TODO
+			sd.appendLine("SARASA\n");
+			DEBUG_MAIN("Dequeue sample CO2:%u\n", Sensors.getCO2());
 		}
-		vTaskDelay(2000 / portTICK_RATE_MS);
 	}
 }
 
 
 void transmitTask ( void *pvParameters) {
 	BaseType_t rv;
-
+	while (1) {
+		// TODO
+		vTaskDelay(2000 / portTICK_RATE_MS);
+	}
 }
 
 void setup()
 {
+	// Serial initialization
 	Serial.begin(115200);
 
+	// I2C and sensors initialization
 	Sensors.init();
 
+	// SPI and SD initialization
 	sd.init();
+
+	// GPS initialization
+	gps.init();
 
 	xTaskCreatePinnedToCore(
 			sensorsTask,   /* Function to implement the task */
@@ -125,9 +131,14 @@ void setup()
 	}
 }
 
-// Arduino Loop hook. Whatchdog happens inside this task
+//
+//! Arduino Loop hook. Whatchdog happens inside this taskTask function to read data from sensors and push to Queues
+
 void loop()
 {
+	String nmea;
+	nmea = gps.getNMEA();
+	DEBUG_MAIN("RECIBO NMEA %s\n", nmea.c_str());
     delay(1000); //Don't spam the I2C bus
 }
 

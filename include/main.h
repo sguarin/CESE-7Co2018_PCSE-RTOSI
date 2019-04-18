@@ -14,6 +14,7 @@
 
 #include <mySD.h>
 #include <mySensors.h>
+#include <myGPS.h>
 
 
 #ifdef DEBUG

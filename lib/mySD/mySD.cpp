@@ -1,3 +1,10 @@
+/******************************************************************************
+
+  Sebastián Guarino
+
+  Distributed as-is; no warranty is given.
+******************************************************************************/
+
 #include <mySD.h>
 
 /* Constructor */
@@ -14,10 +21,10 @@ void mySD::init() {
 bool mySD::appendLine(const String &data) {
 	if (!outputFile) {
 		if (SD.exists(C_MYSD_FILENAME)) {
-			outputFile = SD.open("output.csv", FILE_APPEND);
+			outputFile = SD.open(C_MYSD_FILENAME, FILE_APPEND);
 			DEBUG_MYSD("Open file %s in write mode\n", C_MYSD_FILENAME);
 		} else {
-			outputFile = SD.open("output.csv", FILE_APPEND);
+			outputFile = SD.open(C_MYSD_FILENAME, FILE_APPEND);
 			DEBUG_MYSD("Open file %s in append mode\n", C_MYSD_FILENAME);
 		}
 		if (!outputFile) {
@@ -25,6 +32,7 @@ bool mySD::appendLine(const String &data) {
 			return false;
 		}
 	}
+
 	if (outputFile.print(data) != data.length()) {
 		DEBUG_MYSD("Error written less bytes than expected\n");
 		return false;
@@ -48,6 +56,7 @@ String mySD::getDir(const String &dirname) {
 			listing.concat(file.size());
 			listing.concat(",");
 			// TODO DATE/TIME here
+			// must be implemented inside FS library
 			listing.concat("");
 		}
 		file = root.openNextFile();

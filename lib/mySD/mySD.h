@@ -13,7 +13,6 @@
 #include <SD.h>
 #include <SPI.h>
 
-
 #ifdef DEBUG
   #ifndef DEBUG_ESP_PORT
     #define DEBUG_ESP_PORT Serial
@@ -29,7 +28,7 @@
 const char C_STATUS_EMPTY[] = "Vacia";
 const char C_STATUS_PRESENT[] = "Presente";
 
-const char C_MYSD_FILENAME[] PROGMEM = "output.txt";
+const char C_MYSD_FILENAME[] PROGMEM = "/output.txt";
 
 class mySD
 {
