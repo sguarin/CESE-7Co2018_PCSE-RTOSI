@@ -42,4 +42,4 @@
 
 5. Open url in browser
 
-http://onyx.local or http://192.168.4.1
+http://cese.local or http://192.168.4.1
