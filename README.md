@@ -8,11 +8,11 @@ platformio platform install espressif32
 
 1. Reset ESP from scratch
 
-    En Linux:
-    ~/.platformio/packages/tool-esptool/esptool -ce -v -cp /dev/ttyUSB0
+    * En Linux:
+    ```~/.platformio/packages/tool-esptool/esptool -ce -v -cp /dev/ttyUSB0```
 
-    En Windows:
-    .platformio/packages/tool-esptool/esptool -ce -v -cp COM3
+    * En Windows:
+    ```.platformio/packages/tool-esptool/esptool -ce -v -cp COM3```
 
 2. Upload data FS
 
