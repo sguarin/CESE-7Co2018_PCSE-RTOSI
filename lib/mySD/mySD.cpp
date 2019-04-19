@@ -10,6 +10,7 @@
 /* Constructor */
 void mySD::init() {
 	/* initialize object members with defaults */
+	/* Optionaly you can select SD.begin(CS_PIN) */
     if(!SD.begin()) {
     	status = C_STATUS_EMPTY;
         DEBUG_MYSD("Card Mount Failed");
@@ -18,10 +19,10 @@ void mySD::init() {
     status = C_STATUS_PRESENT;
 }
 
-bool mySD::appendLine(const String &data) {
+bool mySD::appendLine(const char *data) {
 	if (!outputFile) {
-		if (SD.exists(C_MYSD_FILENAME)) {
-			outputFile = SD.open(C_MYSD_FILENAME, FILE_APPEND);
+		if (!SD.exists(C_MYSD_FILENAME)) {
+			outputFile = SD.open(C_MYSD_FILENAME, FILE_WRITE);
 			DEBUG_MYSD("Open file %s in write mode\n", C_MYSD_FILENAME);
 		} else {
 			outputFile = SD.open(C_MYSD_FILENAME, FILE_APPEND);
@@ -33,10 +34,13 @@ bool mySD::appendLine(const String &data) {
 		}
 	}
 
-	if (outputFile.print(data) != data.length()) {
+	if (outputFile.print(data) != strlen(data)) {
 		DEBUG_MYSD("Error written less bytes than expected\n");
 		return false;
 	}
+	// TODO count N writes to close and reopen
+	outputFile.close();
+	DEBUG_MYSD("WRITE OK\n");
 	return true;
 }
 

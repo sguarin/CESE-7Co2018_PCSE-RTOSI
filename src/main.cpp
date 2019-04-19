@@ -51,34 +51,47 @@ void sensorsTask( void * pvParameters ) {
     }
 }
 
-//! Task to dequeue data from dataQueue and write to SD
+//! Task to dequeue data from dataStoreQueue and write to SD
 /*!
 	\param pvParameters its FreeRTOS arg
  */
 void SDTask( void * pvParameters) {
 	BaseType_t rv;
 	dataItem_t dataItem;
+	String dataLine;
 	while (1) {
 		rv = xQueueReceive(dataStoreQueue, &dataItem, portMAX_DELAY);
 		if (rv != pdPASS) {
-			DEBUG_MAIN("Error: getting data from dataQueue\n");
+			DEBUG_MAIN("Error: getting data from dataStoreQueue\n");
 		} else {
-			// TODO
-			sd.appendLine("SARASA\n");
+			dataLine = Sensors.getCO2();
+			dataLine.concat(",");
+			dataLine.concat(Sensors.getTVOC());
+			dataLine.concat("\n");
+			sd.appendLine(dataLine.c_str());
 			DEBUG_MAIN("Dequeue sample CO2:%u\n", Sensors.getCO2());
 		}
 	}
 }
 
-
-void transmitTask ( void *pvParameters) {
+//! Task to dequeue data from dataTransmitQueue and transmit
+/*!
+	\param pvParameters its FreeRTOS arg
+ */
+void transmitTask (void *pvParameters) {
 	BaseType_t rv;
+	dataItem_t dataItem;
 	while (1) {
-		// TODO
-		vTaskDelay(2000 / portTICK_RATE_MS);
+		rv = xQueueReceive(dataTransmitQueue, &dataItem, portMAX_DELAY);
+		if (rv != pdPASS) {
+			DEBUG_MAIN("Error: getting data from dataTransmitQueue\n");
+		} else {
+			// TODO
+		}
 	}
 }
 
+//! Arduino setup run once at start of main
 void setup()
 {
 	// Serial initialization
@@ -91,7 +104,8 @@ void setup()
 	sd.init();
 
 	// GPS initialization
-	gps.init();
+	//gps.init();
+
 
 	xTaskCreatePinnedToCore(
 			sensorsTask,   /* Function to implement the task */
@@ -116,7 +130,7 @@ void setup()
 			"transmitTask", /* Name of the task */
 			10000,      /* Stack size in words */
 			NULL,       /* Task input parameter */
-			2,          /* Priority of the task */
+			1,          /* Priority of the task */
 			NULL,       /* Task handle. */
 			1);  /* Core where the task should run */
 
@@ -129,17 +143,18 @@ void setup()
 	if (dataTransmitQueue == 0) {
 		DEBUG_MAIN("Error creating queue\n");
 	}
+
+	DEBUG_MAIN("Setup initialization finished\n");
+	delay(1000);
 }
 
-//
-//! Arduino Loop hook. Whatchdog happens inside this taskTask function to read data from sensors and push to Queues
-
+//! Arduino Loop hook. Whatchdog happens inside this task
 void loop()
 {
-	String nmea;
-	nmea = gps.getNMEA();
-	DEBUG_MAIN("RECIBO NMEA %s\n", nmea.c_str());
-    delay(1000); //Don't spam the I2C bus
+//	String nmea;
+//	nmea = gps.getNMEA();
+//	DEBUG_MAIN("RECIBO NMEA %s\n", nmea.c_str());
+    delay(1000); //Don't spam the CPU
 }
 
 

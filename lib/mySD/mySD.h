@@ -37,7 +37,7 @@ class mySD
     void mount();
     String status;
 
-    bool appendLine(const String &data);
+    bool appendLine(const char *data);
 
     String getDir(const String &dirname);
     String getTotalBytes();
