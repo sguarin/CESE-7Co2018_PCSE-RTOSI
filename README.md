@@ -35,9 +35,12 @@
   ```
 
 4. Board will connect to Wifi network and mqtt broker defined in main.h
+
+  ```
   #define WIFI_SSID "NONAME 2.4GHz.-"
   #define WIFI_PASSWORD "XXX"
   #define MQTT_HOST "mine.sguarin.com.ar"
   #define MQTT_USER "sadpefe_client"
   #define MQTT_PASSWORD "sadpefe_client00"
+  ```
   
