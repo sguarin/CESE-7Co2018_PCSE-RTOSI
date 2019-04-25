@@ -1,10 +1,9 @@
 
-#ifndef mySensors_h
-#define mySensors_h
+#ifndef MYSENSORS_H
+#define MYSENSORS_H
 
 #include <Arduino.h>
 #include <Wire.h>
-
 
 #ifdef DEBUG
   #ifndef DEBUG_ESP_PORT
@@ -24,8 +23,6 @@ public:
 	void init();
 	bool update();
 
-	//String status;
-	//String getTotalBytes();
 	uint16_t getCO2();
 	uint16_t getTVOC();
 	unsigned long getRTC();
@@ -36,6 +33,5 @@ protected:
 };
 
 extern mySensors Sensors;
-
 
 #endif

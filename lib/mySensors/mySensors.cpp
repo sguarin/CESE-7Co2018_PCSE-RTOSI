@@ -9,7 +9,6 @@ CCS811 myGasSensor(CCS811_ADDR);
 
 BMP280 bmp;
 
-
 /* init */
 void mySensors::init() {
 

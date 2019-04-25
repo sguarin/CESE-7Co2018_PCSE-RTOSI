@@ -38,7 +38,8 @@ bool mySD::appendLine(const char *data) {
 		DEBUG_MYSD("Error written less bytes than expected\n");
 		return false;
 	}
-	// TODO count N writes to close and reopen
+	// TODO investigate bug in SD library. Close shouldn't be necesary
+	// or count N writes to close and reopen
 	outputFile.close();
 	DEBUG_MYSD("WRITE OK\n");
 	return true;

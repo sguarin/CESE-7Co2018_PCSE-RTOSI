@@ -1,6 +1,4 @@
 
-#include "myMQTT.h"
-#include <MQTT.h>
 /******************************************************************************
 
   Sebastián Guarino
@@ -8,32 +6,33 @@
 
   Distributed as-is; no warranty is given.
 ******************************************************************************/
-
+#include "MyMQTT.h"
+#include <MQTT.h>
 #include <WiFi.h>
 
 WiFiClient net;
 MQTTClient client;
 
 /* init */
-void myMQTT::init(const char *host2, const char *brokerHost, const char *user2, const char *password2) {
+void MyMQTT::init(const char *host2, const char *brokerHost, const char *user2, const char *password2) {
 	host = String(host2);
 	user = String(user2);
 	password = String(password2);
 	client.begin(brokerHost, net);
 }
 
-bool myMQTT::publish(const String &topic, const String &data) {
+bool MyMQTT::publish(const String &topic, const String &data) {
 	if (!client.connected()) {
 		  connect();
 	}
 	return client.publish(topic, data);
 }
 
-void myMQTT::connect() {
+void MyMQTT::connect() {
 	while (!client.connect(host.c_str(), user.c_str(), password.c_str())) {
 		delay(1000);
 	}
 }
 
-myMQTT mqtt;
+MyMQTT mqtt;
 

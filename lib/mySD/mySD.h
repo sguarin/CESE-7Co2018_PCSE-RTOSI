@@ -5,8 +5,8 @@
   Distributed as-is; no warranty is given.
 ******************************************************************************/
 
-#ifndef mySD_h
-#define mySD_h
+#ifndef MYSD_H
+#define MYSD_H
 
 #include <Arduino.h>
 #include <FS.h>

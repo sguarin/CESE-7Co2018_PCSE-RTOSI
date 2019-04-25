@@ -1,6 +1,6 @@
 
-#ifndef MAIN_H
-#define MAIN_H
+#ifndef __MAIN_H
+#define __MAIN_H
 
 #include <Arduino.h>
 #include <WiFi.h>
@@ -14,34 +14,22 @@
 
 #include <mySD.h>
 #include <mySensors.h>
-#include <myGPS.h>
+#include <MyMQTT.h>
+#include <MyGPS.h>
 
+#define WIFI_SSID "NONAME 2.4GHz.-"
+#define WIFI_PASSWORD "mafra00000"
 
-#ifdef DEBUG
-  #ifndef DEBUG_ESP_PORT
-    #define DEBUG_ESP_PORT Serial
-  #endif
-  #ifndef DEBUG_ESP_WIFI
-    #define DEBUG_ESP_WIFI 1
-  #endif
-  #define DEBUG_MAIN(...) DEBUG_ESP_PORT.print("DEBUG MAIN: "); DEBUG_ESP_PORT.printf( __VA_ARGS__ )
-#else
-  #define DEBUG_MAIN(...)
-#endif
-
-#ifdef DEBUG_ESP_PORT
-#define INFO_ESP_PORT DEBUG_ESP_PORT
-#else
-#define INFO_ESP_PORT Serial
-#endif
-#define INFO_MAIN(...) INFO_ESP_PORT.print("INFO MAIN: "); INFO_ESP_PORT.printf( __VA_ARGS__ )
+//#define WIFI_SSID "mihu"
+//#define WIFI_PASSWORD "mihu00000"
 
 #define HOST "sadpefe"
-#define ADMIN_USERNAME "admin"
-#define ADMIN_PASSWORD "sadpefe"
+#define MQTT_HOST "mine.sguarin.com.ar"
+#define MQTT_USER "sadpefe_client"
+#define MQTT_PASSWORD "sadpefe_client00"
 
 /* ROM Stored strings */
-const char GC_TEXT_HTML[] PROGMEM = "text/html";
+const char GC_HOST[] PROGMEM = HOST;
 
 #endif
 

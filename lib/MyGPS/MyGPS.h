@@ -7,10 +7,11 @@
   Distributed as-is; no warranty is given.
 ******************************************************************************/
 
-#ifndef MYGPS_H
-#define MYGPS_H
+#ifndef __MyGPS_h
+#define __MyGPS_h
 
 #include <Arduino.h>
+#include <TinyGPS++.h>
 
 #ifdef DEBUG
   #ifndef DEBUG_ESP_PORT
@@ -24,18 +25,25 @@
   #define DEBUG_MYGPS(...)
 #endif
 
-class myGPS
+#define MYGPS_SERIAL Serial2
+
+class MyGPS
 {
   public:
     void init();
-    String status;
+    bool update();
 
     String getNMEA();
+    String getTime();
+    double getLat();
+    double getLng();
+    double getAlt();
 
   private:
+    bool status;
 
 };
 
-extern myGPS gps;
+extern MyGPS gps;
 
 #endif
