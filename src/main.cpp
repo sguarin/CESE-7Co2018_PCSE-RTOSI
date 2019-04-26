@@ -131,8 +131,8 @@ void transmitTask (void *pvParameters) {
 			INFO_MAIN("Error: getting data from dataTransmitQueue\n");
 		} else {
 			dataLine = data2str(&dataItem);
-			if (WiFi.status() == WL_CONNECTED)
-				mqtt.publish("co2", dataLine);
+//			if (WiFi.status() == WL_CONNECTED)
+//				mqtt.publish("co2", dataLine);
 		}
 	}
 }
