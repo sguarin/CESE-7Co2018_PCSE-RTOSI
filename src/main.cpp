@@ -39,7 +39,7 @@ xSemaphoreHandle serialLock;
   #ifndef DEBUG_ESP_WIFI
     #define DEBUG_ESP_WIFI 1
   #endif
-  #define DEBUG_MAIN(...) DEBUG_ESP_PORT.print("DEBUG MAIN: "); DEBUG_ESP_PORT.printf( __VA_ARGS__ )
+  #define DEBUG_MAIN(...) SERIAL_MUTEX_LOCK(); DEBUG_ESP_PORT.print("DEBUG MAIN: "); DEBUG_ESP_PORT.printf( __VA_ARGS__ ); SERIAL_MUTEX_UNLOCK()
 #else
   #define DEBUG_MAIN(...)
 #endif
@@ -50,6 +50,7 @@ xSemaphoreHandle serialLock;
 #define INFO_ESP_PORT Serial
 #endif
 #define INFO_MAIN(...) SERIAL_MUTEX_LOCK(); INFO_ESP_PORT.print("INFO MAIN: "); INFO_ESP_PORT.printf( __VA_ARGS__ ) ; SERIAL_MUTEX_UNLOCK()
+
 
 
 /* Functions declarations */
@@ -131,8 +132,8 @@ void transmitTask (void *pvParameters) {
 			INFO_MAIN("Error: getting data from dataTransmitQueue\n");
 		} else {
 			dataLine = data2str(&dataItem);
-//			if (WiFi.status() == WL_CONNECTED)
-//				mqtt.publish("co2", dataLine);
+			if (WiFi.status() == WL_CONNECTED)
+				mqtt.publish("co2", dataLine);
 		}
 	}
 }
@@ -180,6 +181,25 @@ void setup()
 	// GPS initialization
 	gps.init();
 
+	// create queue for data to store in sd
+	dataStoreQueue = xQueueCreate(DATA_STORE_QUEUE_SIZE, sizeof(dataItem_t));
+	if (dataStoreQueue == 0) {
+		INFO_MAIN("Error creating store queue\n");
+	}
+
+	// create queue for data to tranmit via mqtt
+	dataTransmitQueue = xQueueCreate(DATA_TRANSMIT_QUEUE_SIZE, sizeof(dataItem_t));
+	if (dataTransmitQueue == 0) {
+		INFO_MAIN("Error creating transmit queue\n");
+	}
+
+	// create serial MUTEX
+	serialLock = xSemaphoreCreateMutex();
+	if (serialLock == 0) {
+		INFO_MAIN("Error creating serial MUTEX\n");
+	}
+
+	// create tasks
 	xTaskCreatePinnedToCore(
 			sensorsTask,   /* Function to implement the task */
 			"sensorsTask", /* Name of the task */
@@ -207,15 +227,6 @@ void setup()
 			NULL,       /* Task handle. */
 			1);  /* Core where the task should run */
 
-	dataStoreQueue = xQueueCreate(DATA_STORE_QUEUE_SIZE, sizeof(dataItem_t));
-	if (dataStoreQueue == 0) {
-		INFO_MAIN("Error creating queue\n");
-	}
-
-	dataTransmitQueue = xQueueCreate(DATA_TRANSMIT_QUEUE_SIZE, sizeof(dataItem_t));
-	if (dataTransmitQueue == 0) {
-		INFO_MAIN("Error creating queue\n");
-	}
 
 	INFO_MAIN("Setup initialization finished\n");
 	delay(1000);
