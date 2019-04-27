@@ -1,7 +1,10 @@
+
+# MQTT
 mqttServer="localhost"
 mqttPort="1883"
 channelSubs="co2"
-ES_INDEX="co2c"
+
+ES_INDEX="smmr"
 
 #channelSubs="$SYS/#"
 #use below as alternative to subscribe to all channels
@@ -23,12 +26,6 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     print(msg.topic+" "+str(msg.payload))
  
-# this is the syntax to follow for the elasticSearch update taken from documentation
-#    es.index(index="my-index", doc_type="test-type", id=42, body={"any": +str(msg.payload, "timestamp": datetime.now()})
-#    {u'_id': u'42', u'_index': u'my-index', u'_type': u'test-type', u'_version': 1, u'ok': True}
-
-#our implementation uses this to separate numeric(float) from string data
-
     #try:
     a = msg.payload.split(',')
     timestamp_str = a[0]
@@ -45,8 +42,8 @@ def on_message(client, userdata, msg):
     tvoc = float(a[5])
     temp = float(a[6])
     hum = float(a[7])
-	
-    es.index(index=ES_INDEX, doc_type="numeric", body={"topic" : msg.topic, "lat" : lat, "lng" : lng, "alt" : alt, "co2" : co2, "tvoc" : tvoc, "temp" : temp, "hum" : hum, "timestamp" : timestamp_obj, "timestamp_inserted" : datetime.utcnow()})
+    
+    es.index(index=ES_INDEX, doc_type="_doc", body={"topic" : msg.topic, "location" : lat+","+lng, "alt" : alt, "co2" : co2, "tvoc" : tvoc, "temp" : temp, "hum" : hum, "timestamp" : timestamp_obj, "timestamp_inserted" : datetime.utcnow()})
     
 # by default we connect to elasticSearch on localhost:9200
 es = Elasticsearch()
@@ -56,7 +53,19 @@ client.on_connect = on_connect
 client.on_message = on_message
 client.connect(mqttServer, mqttPort, 60)
 #es.indices.delete(index=ES_INDEX, ignore=404)
-es.indices.create(index=ES_INDEX, ignore=400)
+
+request_body = {
+    "mappings" : {
+        "_doc" : {
+            "properties" : {
+                "location" : { "type" : "geo_point" },
+                "timestamp" : { "type" : "date" }
+            }
+        }
+    }
+}
+
+es.indices.create(index=ES_INDEX, ignore=400, body=request_body)
 
 # Blocking call that processes network traffic, dispatches callbacks and
 # handles reconnecting.
