@@ -9,6 +9,7 @@
 #include <Arduino.h>
 #include <main.h>
 
+/*==================[internal data definition]===============================*/
 typedef struct item {
 	char time[20]; // DD/MM/AAAA HH:MM:SS
 
@@ -30,7 +31,9 @@ QueueHandle_t dataStoreQueue;
 QueueHandle_t dataTransmitQueue;
 
 xSemaphoreHandle serialLock;
+/* End internal data declarations */
 
+/*==================[macros and definitions]=================================*/
 #define SERIAL_MUTEX_LOCK()    do {} while (xSemaphoreTake(serialLock, portMAX_DELAY) != pdPASS)
 #define SERIAL_MUTEX_UNLOCK()  xSemaphoreGive(serialLock)
 
@@ -53,15 +56,15 @@ xSemaphoreHandle serialLock;
 #endif
 #define INFO_MAIN(...) SERIAL_MUTEX_LOCK(); INFO_ESP_PORT.print("INFO MAIN: "); INFO_ESP_PORT.printf( __VA_ARGS__ ) ; SERIAL_MUTEX_UNLOCK()
 
-
-
-/* Functions declarations */
+/*==================[internal functions declaration]=========================*/
 String data2str(dataItem_t *dataItem);
 void sensorsTask( void * pvParameters );
 void SDTask( void * pvParameters);
 void transmitTask (void *pvParameters);
-/* End Functions declarations */
+void loopForever();
 
+
+/*==================[internal functions definition]==========================*/
 
 //! Task function to read data from sensors and push to Queues
 /*!
@@ -164,6 +167,14 @@ String data2str(dataItem_t *dataItem) {
 	return dataLine;
 }
 
+//! Loop Forever
+void loopForever()
+{
+    delay(1000); //Don't spam the CPU
+}
+
+/*==================[external functions definition]==========================*/
+
 //! Arduino setup run once at start of main
 void setup()
 {
@@ -193,7 +204,10 @@ void setup()
 	}
 
 	// I2C and sensors initialization
-	sensors.init();
+	if (!sensors.init()) {
+		DEBUG_MAIN("Error inicializando Sensores");
+		loopForever();
+	}
 
 	// SPI and SD initialization
 	sd.init();
