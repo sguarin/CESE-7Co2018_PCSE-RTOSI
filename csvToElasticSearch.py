@@ -1,3 +1,6 @@
+
+ES_INDEX="smmr"
+
 from datetime import datetime
 from elasticsearch import Elasticsearch
 
@@ -17,9 +20,12 @@ def process_message(msg):
     alt = a[3]
     co2 = float(a[4])
     tvoc = float(a[5])
+    temp = float(a[6])
+    hum = float(a[7])
 	
     try:
-        es.index(index="co2", doc_type="numeric", body={"topic" : "co2_gps", "lat" : lat, "lng" : lng, "alt" : alt, "co2" : co2, "tvoc" : tvoc, "timestamp" : timestamp_obj, "timestamp_inserted" : datetime.utcnow()})
+        es.index(index=ES_INDEX, doc_type="_doc", body={"topic" : "co2", "location" : lat+","+lng, "alt" : alt, "co2" : co2, "tvoc" : tvoc, "temp" : temp, "hum" : hum, "timestamp" : timestamp_obj, "timestamp_inserted" : datetime.utcnow()})
+        #es.index(index="co2", doc_type="numeric", body={"topic" : "co2_gps", "lat" : lat, "lng" : lng, "alt" : alt, "co2" : co2, "tvoc" : tvoc, "timestamp" : timestamp_obj, "timestamp_inserted" : datetime.utcnow()})
     	
     except:
         print 'Error es.index'
@@ -28,18 +34,14 @@ def process_message(msg):
 # by default we connect to elasticSearch on localhost:9200
 es = Elasticsearch()
 #es.indices.delete(index='co2', ignore=400)
-es.indices.create(index='co2', ignore=400)
+#es.indices.create(index='co2', ignore=400)
 
 # Blocking call that processes network traffic, dispatches callbacks and
 # handles reconnecting.
 # Other loop*() functions are available that give a threaded interface and a
 # manual interface.
 # while read client.loop_forever()
-for line in open('output_gps.txt'):
+for line in open('output.txt'):
     process_message(line.rstrip())
-
-
-
-
 
 

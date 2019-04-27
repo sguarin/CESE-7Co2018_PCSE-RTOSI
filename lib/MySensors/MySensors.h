@@ -1,6 +1,6 @@
 
-#ifndef MYSENSORS_H
-#define MYSENSORS_H
+#ifndef __MySensors_h__
+#define __MySensors_h__
 
 #include <Arduino.h>
 #include <Wire.h>
@@ -17,21 +17,26 @@
   #define DEBUG_MYSENSORS(...)
 #endif
 
-class mySensors
+class MySensors
 {
 public:
-	void init();
+	bool init();
 	bool update();
 
 	uint16_t getCO2();
 	uint16_t getTVOC();
-	unsigned long getRTC();
+	float getTemp();
+	float getHum();
+	float getPres();
 
 protected:
 	//Variables
-	double bmpTemp,bmpPres;
+	float bmpTemp;
+	float bmpPres;
+	double hdcTemp;
+	double hdcHum;
 };
 
-extern mySensors Sensors;
+extern MySensors sensors;
 
 #endif

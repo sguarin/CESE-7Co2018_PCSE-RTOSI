@@ -5,10 +5,10 @@
   Distributed as-is; no warranty is given.
 ******************************************************************************/
 
-#include <mySD.h>
+#include <MySD.h>
 
 /* Constructor */
-void mySD::init() {
+void MySD::init() {
 	/* initialize object members with defaults */
 	/* Optionaly you can select SD.begin(CS_PIN) */
     if(!SD.begin()) {
@@ -19,7 +19,7 @@ void mySD::init() {
     status = C_STATUS_PRESENT;
 }
 
-bool mySD::appendLine(const char *data) {
+bool MySD::appendLine(const char *data) {
 	if (!outputFile) {
 		if (!SD.exists(C_MYSD_FILENAME)) {
 			outputFile = SD.open(C_MYSD_FILENAME, FILE_WRITE);
@@ -45,7 +45,7 @@ bool mySD::appendLine(const char *data) {
 	return true;
 }
 
-String mySD::getDir(const String &dirname) {
+String MySD::getDir(const String &dirname) {
 	String listing;
 	File root = SD.open(dirname);
 	if (!root.isDirectory())
@@ -69,22 +69,22 @@ String mySD::getDir(const String &dirname) {
 	return listing;
 }
 
-String mySD::getUsedBytes() {
+String MySD::getUsedBytes() {
 	uint64_t u = SD.usedBytes();
 	return uint64ToString(u);
 }
 
-String mySD::getTotalBytes() {
+String MySD::getTotalBytes() {
 	uint64_t u = SD.totalBytes();
 	return uint64ToString(u);
 }
 
-String mySD::getFreeBytes() {
+String MySD::getFreeBytes() {
 	uint64_t u = SD.totalBytes() - SD.usedBytes();
 	return uint64ToString(u);
 }
 
-String mySD::uint64ToString(uint64_t input) {
+String MySD::uint64ToString(uint64_t input) {
 	String result = "";
 	uint8_t base = 10;
 
@@ -101,5 +101,5 @@ String mySD::uint64ToString(uint64_t input) {
 	return result;
 }
 
-mySD sd;
+MySD sd;
 

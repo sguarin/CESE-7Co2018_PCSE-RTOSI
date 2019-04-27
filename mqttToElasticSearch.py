@@ -1,6 +1,7 @@
 mqttServer="localhost"
 mqttPort="1883"
 channelSubs="co2"
+ES_INDEX="co2c"
 
 #channelSubs="$SYS/#"
 #use below as alternative to subscribe to all channels
@@ -42,13 +43,10 @@ def on_message(client, userdata, msg):
     alt = a[3]
     co2 = float(a[4])
     tvoc = float(a[5])
+    temp = float(a[6])
+    hum = float(a[7])
 	
-    es.index(index="co2", doc_type="numeric", body={"topic" : msg.topic, "lat" : lat, "lng" : lng, "alt" : alt, "co2" : co2, "tvoc" : tvoc, "timestamp" : timestamp_obj, "timestamp_inserted" : datetime.utcnow()})
-    #es.index(index="co2", doc_type="numeric", body={"topic" : msg.topic, "timestamp" : timestamp_obj, "lat" : lat, "lng" : lng, "alt" : alt, "co2" : co2, "tvoc" : tvoc, "timestamp_inserted": datetime.utcnow()})
-	#es.index(index="co2", doc_type="numeric", body={"topic" : msg.topic, "dataFloat" : float(msg.payload), "timestamp": datetime.utcnow()})
-    	
-    #except:
-	#es.index(index="co2", doc_type="string", body={"topic" : msg.topic, "dataString" : msg.payload, "timestamp": datetime.utcnow()})
+    es.index(index=ES_INDEX, doc_type="numeric", body={"topic" : msg.topic, "lat" : lat, "lng" : lng, "alt" : alt, "co2" : co2, "tvoc" : tvoc, "temp" : temp, "hum" : hum, "timestamp" : timestamp_obj, "timestamp_inserted" : datetime.utcnow()})
     
 # by default we connect to elasticSearch on localhost:9200
 es = Elasticsearch()
@@ -56,18 +54,13 @@ es = Elasticsearch()
 client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
-client.connect(mqttServer,mqttPort, 60)
-#es.indices.delete(index='co2', ignore=400)
-es.indices.create(index='co2', ignore=400)
+client.connect(mqttServer, mqttPort, 60)
+#es.indices.delete(index=ES_INDEX, ignore=404)
+es.indices.create(index=ES_INDEX, ignore=400)
 
 # Blocking call that processes network traffic, dispatches callbacks and
 # handles reconnecting.
 # Other loop*() functions are available that give a threaded interface and a
 # manual interface.
 client.loop_forever()
-
-
-
-
-
 

@@ -11,14 +11,16 @@
 
 typedef struct item {
 	char time[20]; // DD/MM/AAAA HH:MM:SS
-	unsigned long millis;
 
 	double lat;
 	double lng;
 	double alt;
 
-	uint16_t CO2; // PPM
-	uint16_t TVOC;
+	uint16_t co2; // PPM
+	uint16_t tvoc; // PPM
+	float temp;
+	float pres;
+	float hum;
 } dataItem_t;
 
 #define DATA_STORE_QUEUE_SIZE		5
@@ -69,11 +71,14 @@ void sensorsTask( void * pvParameters ) {
 	BaseType_t rv;
 	dataItem_t dataItem;
     while(true) {
-    	if (Sensors.update() && gps.update()) {
+    	if (sensors.update() && gps.update()) {
     		// add data to queue
-    		dataItem.CO2 = Sensors.getCO2();
-    		dataItem.TVOC =  Sensors.getTVOC();
-    		dataItem.millis =  Sensors.getRTC();
+    		dataItem.co2 = sensors.getCO2();
+    		dataItem.tvoc =  sensors.getTVOC();
+
+    		dataItem.temp = sensors.getTemp();
+    		dataItem.hum = sensors.getHum();
+    		dataItem.pres = sensors.getPres();
 
     		strncpy(dataItem.time, gps.getTime().c_str(), 20);
     		dataItem.lat = gps.getLat();
@@ -148,9 +153,14 @@ String data2str(dataItem_t *dataItem) {
 	dataLine.concat(",");
 	dataLine.concat(dataItem->alt);
 	dataLine.concat(",");
-	dataLine.concat(dataItem->CO2);
+	dataLine.concat(dataItem->co2);
 	dataLine.concat(",");
-	dataLine.concat(dataItem->TVOC);
+	dataLine.concat(dataItem->tvoc);
+	dataLine.concat(",");
+	dataLine.concat(dataItem->temp);
+	dataLine.concat(",");
+	dataLine.concat(dataItem->hum);
+
 	return dataLine;
 }
 
@@ -160,23 +170,37 @@ void setup()
 	// Serial initialization
 	Serial.begin(115200);
 
+	// create serial MUTEX
+	serialLock = xSemaphoreCreateMutex();
+	if (serialLock == 0) {
+		INFO_MAIN("Error creating serial MUTEX\n");
+	}
+
 	// Wifi initilization
 	uint8_t n = 0;
+	WiFi.setAutoConnect(false);
+	WiFi.setAutoReconnect(false);
 	WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 	while (WiFi.status() != WL_CONNECTED && n <= 10) {
 		Serial.print(".");
 		n++;
 		delay(1000);
 	}
+	if (WiFi.status() != WL_CONNECTED) {
+		WiFi.disconnect();
+		INFO_MAIN("WIFI Disabled\n");
+		delay(1000);
+	}
 
 	// I2C and sensors initialization
-	Sensors.init();
+	sensors.init();
 
 	// SPI and SD initialization
 	sd.init();
 
 	// MQTT Client initialization
-	mqtt.init(HOST, MQTT_HOST, MQTT_USER, MQTT_PASSWORD);
+	if (WiFi.status() == WL_CONNECTED)
+		mqtt.init(HOST, MQTT_HOST, MQTT_USER, MQTT_PASSWORD);
 
 	// GPS initialization
 	gps.init();
@@ -187,16 +211,10 @@ void setup()
 		INFO_MAIN("Error creating store queue\n");
 	}
 
-	// create queue for data to tranmit via mqtt
+	// create queue for data to transmit via mqtt
 	dataTransmitQueue = xQueueCreate(DATA_TRANSMIT_QUEUE_SIZE, sizeof(dataItem_t));
 	if (dataTransmitQueue == 0) {
 		INFO_MAIN("Error creating transmit queue\n");
-	}
-
-	// create serial MUTEX
-	serialLock = xSemaphoreCreateMutex();
-	if (serialLock == 0) {
-		INFO_MAIN("Error creating serial MUTEX\n");
 	}
 
 	// create tasks
@@ -226,7 +244,6 @@ void setup()
 			1,          /* Priority of the task */
 			NULL,       /* Task handle. */
 			1);  /* Core where the task should run */
-
 
 	INFO_MAIN("Setup initialization finished\n");
 	delay(1000);

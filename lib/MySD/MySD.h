@@ -5,8 +5,8 @@
   Distributed as-is; no warranty is given.
 ******************************************************************************/
 
-#ifndef MYSD_H
-#define MYSD_H
+#ifndef __MySD_h__
+#define __MySD_h__
 
 #include <Arduino.h>
 #include <FS.h>
@@ -30,7 +30,7 @@ const char C_STATUS_PRESENT[] = "Presente";
 
 const char C_MYSD_FILENAME[] PROGMEM = "/output.txt";
 
-class mySD
+class MySD
 {
   public:
     void init();
@@ -50,6 +50,6 @@ class mySD
     File outputFile;
 };
 
-extern mySD sd;
+extern MySD sd;
 
 #endif

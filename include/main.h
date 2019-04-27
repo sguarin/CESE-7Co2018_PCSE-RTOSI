@@ -12,13 +12,13 @@
 #include <ESP8266WiFi.h>
 #endif
 
-#include <mySD.h>
-#include <mySensors.h>
+#include <MySD.h>
+#include <MySensors.h>
 #include <MyMQTT.h>
 #include <MyGPS.h>
 
 #define WIFI_SSID "NONAME 2.4GHz.-"
-#define WIFI_PASSWORD "mafra00000"
+#define WIFI_PASSWORD "mafra0000"
 
 //#define WIFI_SSID "mihu"
 //#define WIFI_PASSWORD "mihu00000"
