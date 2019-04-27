@@ -148,11 +148,15 @@ void transmitTask (void *pvParameters) {
 
 String data2str(dataItem_t *dataItem) {
 	String dataLine;
+	char geoPoint[30];
 	dataLine = (const char *)dataItem->time;
 	dataLine.concat(",");
-	dataLine.concat(dataItem->lat);
-	dataLine.concat(",");
-	dataLine.concat(dataItem->lng);
+	// TODO BUG Report upstream Arduino String concat double
+	snprintf(geoPoint, 29, "%f,%f", dataItem->lat, dataItem->lng);
+	dataLine.concat(geoPoint);
+//	dataLine.concat(dataItem->lat);
+//	dataLine.concat(",");
+//	dataLine.concat(dataItem->lng);
 	dataLine.concat(",");
 	dataLine.concat(dataItem->alt);
 	dataLine.concat(",");
