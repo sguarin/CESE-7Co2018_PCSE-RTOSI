@@ -9,31 +9,11 @@
 #include <Arduino.h>
 #include <main.h>
 
-/*==================[internal data definition]===============================*/
-typedef struct item {
-	char time[20]; // DD/MM/AAAA HH:MM:SS
-
-	double lat;
-	double lng;
-	double alt;
-
-	uint16_t co2; // PPM
-	uint16_t tvoc; // PPM
-	float temp;
-	float pres;
-	float hum;
-} dataItem_t;
+/*==================[macros and definitions]=================================*/
 
 #define DATA_STORE_QUEUE_SIZE		5
-QueueHandle_t dataStoreQueue;
-
 #define DATA_TRANSMIT_QUEUE_SIZE	10
-QueueHandle_t dataTransmitQueue;
 
-xSemaphoreHandle serialLock;
-/* End internal data declarations */
-
-/*==================[macros and definitions]=================================*/
 #define SERIAL_MUTEX_LOCK()    do {} while (xSemaphoreTake(serialLock, portMAX_DELAY) != pdPASS)
 #define SERIAL_MUTEX_UNLOCK()  xSemaphoreGive(serialLock)
 
@@ -56,6 +36,25 @@ xSemaphoreHandle serialLock;
 #endif
 #define INFO_MAIN(...) SERIAL_MUTEX_LOCK(); INFO_ESP_PORT.print("INFO MAIN: "); INFO_ESP_PORT.printf( __VA_ARGS__ ) ; SERIAL_MUTEX_UNLOCK()
 
+/*==================[internal data definition]===============================*/
+typedef struct item {
+	char time[20]; // DD/MM/AAAA HH:MM:SS
+
+	double lat;
+	double lng;
+	double alt;
+
+	uint16_t co2; // PPM
+	uint16_t tvoc; // PPM
+	float temp;
+	float pres;
+	float hum;
+} dataItem_t;
+
+QueueHandle_t dataStoreQueue;
+QueueHandle_t dataTransmitQueue;
+SemaphoreHandle_t serialLock;
+
 /*==================[internal functions declaration]=========================*/
 String data2str(dataItem_t *dataItem);
 void sensorsTask( void * pvParameters );
@@ -72,6 +71,7 @@ void loopForever();
  */
 void sensorsTask( void * pvParameters ) {
 	BaseType_t rv;
+	// TODO bug dataItem no debería ser local
 	dataItem_t dataItem;
     while(true) {
     	if (sensors.update() && gps.update()) {
@@ -188,7 +188,8 @@ void setup()
 	// create serial MUTEX
 	serialLock = xSemaphoreCreateMutex();
 	if (serialLock == 0) {
-		INFO_MAIN("Error creating serial MUTEX\n");
+		INFO_ESP_PORT.print("INFO MAIN: Error creating serial MUTEX\n");
+		//INFO_MAIN("Error creating serial MUTEX\n");
 	}
 
 	// Wifi initilization
