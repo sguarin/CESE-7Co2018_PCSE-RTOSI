@@ -71,7 +71,6 @@ void loopForever();
  */
 void sensorsTask( void * pvParameters ) {
 	BaseType_t rv;
-	// TODO bug dataItem no debería ser local
 	dataItem_t dataItem;
     while(true) {
     	if (sensors.update() && gps.update()) {
@@ -178,7 +177,7 @@ void loopForever()
 }
 
 /*==================[external functions definition]==========================*/
-
+#ifndef UNIT_TEST
 //! Arduino setup run once at start of main
 void setup()
 {
@@ -274,4 +273,5 @@ void loop()
     delay(1000); //Don't spam the CPU
 }
 
+#endif // UNIT_TEST
 

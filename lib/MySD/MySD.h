@@ -33,11 +33,13 @@ const char C_MYSD_FILENAME[] PROGMEM = "/output.txt";
 class MySD
 {
   public:
-    void init();
+    bool init();
     void mount();
     String status;
 
+    bool remove();
     bool appendLine(const char *data);
+    bool readLine(String &line);
 
     String getDir(const String &dirname);
     String getTotalBytes();

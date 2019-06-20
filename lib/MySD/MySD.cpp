@@ -8,15 +8,20 @@
 #include <MySD.h>
 
 /* Constructor */
-void MySD::init() {
+bool MySD::init() {
 	/* initialize object members with defaults */
 	/* Optionaly you can select SD.begin(CS_PIN) */
     if(!SD.begin()) {
     	status = C_STATUS_EMPTY;
         DEBUG_MYSD("Card Mount Failed");
-        return;
+        return false;
     }
     status = C_STATUS_PRESENT;
+    return true;
+}
+
+bool MySD::remove() {
+	return SD.remove(C_MYSD_FILENAME);
 }
 
 bool MySD::appendLine(const char *data) {
@@ -42,6 +47,29 @@ bool MySD::appendLine(const char *data) {
 	// or count N writes to close and reopen
 	outputFile.close();
 	DEBUG_MYSD("WRITE OK\n");
+	return true;
+}
+
+bool MySD::readLine(String &line) {
+	String tmp;
+
+	if (!SD.exists(C_MYSD_FILENAME)) {
+		return false;
+	}
+
+	if (!outputFile) {
+		outputFile = SD.open(C_MYSD_FILENAME, FILE_READ);
+	}
+
+	if (!outputFile) {
+			return false;
+	}
+
+	line = outputFile.readStringUntil('\n');
+
+	// TODO investigate bug in SD library. Close shouldn't be necesary
+	// or count N writes to close and reopen
+	outputFile.close();
 	return true;
 }
 
