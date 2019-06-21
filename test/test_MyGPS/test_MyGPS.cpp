@@ -14,7 +14,14 @@
 void test_NMEA() {
 	String nmea;
 	nmea = gps.getNMEA();
-	INFO_TEST("Recibi este NMEA: %s\n", nmea.c_str());
+//	INFO_TEST("Recibi este NMEA: %s\n", nmea.c_str());
+//	INFO_TEST("NMEA LENGTH: %d\n", nmea.length());
+	// check if starts with $
+	TEST_ASSERT_EQUAL_INT8('$', nmea.c_str()[0]);
+
+	// check CRC * separator
+	TEST_ASSERT_EQUAL_INT8('*', nmea.c_str()[nmea.length()-4]);
+
 	//TEST_ASSERT_TRUE(.appendLine("1"));
 }
 
@@ -34,6 +41,15 @@ void test_getLng() {
 	double Lng = gps.getLng();
 
 	TEST_ASSERT(Lng > minLng && Lng < maxLng);
+}
+
+void test_getAlt() {
+	//
+	double minAlt = -50;
+	double maxAlt = 200;
+	double alt = gps.getAlt();
+
+	TEST_ASSERT(alt > minAlt && alt < maxAlt);
 }
 
 void setup() {
@@ -60,6 +76,8 @@ void loop() {
 		INFO_TEST("Se chequea recibir una Longitud\n");
 		RUN_TEST(test_getLng);
 
+		INFO_TEST("Se chequea recibir una Altitud\n");
+		RUN_TEST(test_getAlt);
 
 		delay(500);
 		i++;

@@ -40,7 +40,11 @@
   #define WIFI_SSID "NONAME 2.4GHz.-"
   #define WIFI_PASSWORD "XXX"
   #define MQTT_HOST "mine.sguarin.com.ar"
-  #define MQTT_USER "sadpefe_client"
-  #define MQTT_PASSWORD "sadpefe_client00"
+  #define MQTT_USER "smmr_client"
+  #define MQTT_PASSWORD "smmr_client00"
   ```
+# Test
   
+  ```
+  platformio test -v
+  ```
